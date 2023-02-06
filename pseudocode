@@ -1,0 +1,60 @@
+// takes posted data from user login form
+username = validateInputs (POST username) // calls validate inputs for user entered username
+password = validateInputs (POST password) // calls validate inputs for user entered password
+hashedPassword = HASH SHA512 (password) // hashes password with PHP built in function
+
+checkUser = checkCreds (username, hashedPassword)
+IF checkUser EQUALS ‘success’ THEN
+SESSION status = ‘userLoggedIn’ // status is logged in to access pages
+SESSION message = ‘Login Successful’ // success message stored in session to be output to
+the user
+REDIRECT location = index.php
+ELSE
+SESSION status = ‘loggedOut’ // prevents users from accessing restricted webpages
+SESSION message = ‘Username or Password Incorrect’
+REDIRECT location = login.php // Takes the user back to the login screen
+ENDIF
+
+// Function – validate and sanitises user inputs
+FUNCTION validateInputs (data)
+HTML SPECIAL CHARS (data) // built in PHP function
+TRIM (data) // built in PHP function
+return data
+END FUNCTION
+
+// Function – checks the credentials with username and hashed password against database entries
+to determine if the user is authorised
+FUNCTION checkCreds (username, hashedPassword)
+// Database credentials
+dbName = ‘localhost’
+
+Validating and sanitising
+inputs within a solution is
+important to ensure the
+system is robust, this
+prevents users form
+entering data which can
+affect the system, an
+example would be an SQL
+style attack on the input
+fields.
+
+dbUser = ‘root
+dbPassword = ‘ password’
+database = users
+TRY
+PDO = connect to users with dbUser, dbPassword // connect to database with creds
+SQL = ‘SELECT name, email FROM users WHERE userName = (username) AND
+password = (hashedPassword) ’ // sql to retrieve data with matching username and
+password
+statement = EXECUTE connection WITH PDO SQL
+CATCH
+SESSION errorMessage = PDO connection error // catches and saves error to session
+variable
+
+IF statement EQUALS 1 THEN // when one entry is found
+return ‘success’
+ELSE // no entry is found
+return ‘failed’
+
+END FUNCTION
